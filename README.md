@@ -1,5 +1,5 @@
 # docker_awx
-------------
+
 AWX setup based on docker-compose. Ready for deployment with Puppet.
 
 Docker-compose
