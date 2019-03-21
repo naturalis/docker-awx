@@ -1,0 +1,39 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6"
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: "rabbitmq:3"
+    env_file:
+      - .env
+
+  memcached:
+    image: "memcached:alpine"
+
+  awx_web:
+    image: "ansible/awx_web:3.0.1"
+    links:
+      - rabbitmq
+      - memcached
+      - postgres
+    ports:
+      - "80:8052"
+    hostname: awxweb
+    user: root
+    env_file:
+      - .env
+
+  awx_task:
+    image: "ansible/awx_task:3.0.1"
+    links:
+      - rabbitmq
+      - memcached
+      - awx_web:awxweb
+      - postgres
+    hostname: awx
+    user: root
+    env_file:
+      - .env
