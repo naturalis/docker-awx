@@ -1,20 +1,46 @@
 version: '3'
+
 services:
+
   postgres:
     image: "postgres:9.6"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
     env_file:
       - .env
 
   rabbitmq:
     image: "rabbitmq:3"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
     env_file:
       - .env
 
   memcached:
     image: "memcached:alpine"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
 
   awx_web:
     image: "ansible/awx_web:3.0.1"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
     links:
       - rabbitmq
       - memcached
@@ -28,6 +54,12 @@ services:
 
   awx_task:
     image: "ansible/awx_task:3.0.1"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
     links:
       - rabbitmq
       - memcached
@@ -37,3 +69,30 @@ services:
     user: root
     env_file:
       - .env
+
+  traefik:
+    image: traefik:1.7.4
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 8081:8080
+    networks:
+      - default
+      - web
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '5'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${BASE_PATH:-/data}/traefiklogs/traefik.log:/var/log/traefik.log
+      - ${TRAEFIK_TOML_FILE:-./traefik.toml}:/traefik.toml
+      - ${CERTDIR:-/etc/letsencrypt}:/etc/letsencrypt
+
+networks:
+    default:
+    web:
+        external: true

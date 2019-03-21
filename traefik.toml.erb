@@ -1,0 +1,61 @@
+debug = true
+checkNewVersion = true
+logLevel = "INFO"
+defaultEntryPoints = ["http","https"]
+
+[entryPoints]
+ [entryPoints.http]
+  address = ":80"
+<% if @traefik_whitelist %>
+    [entryPoints.http.whiteList]
+      sourceRange = ["<%= @traefik_whitelist_array.join('", "') %>"]
+<% end %>
+
+<% if @enable_ssl %>
+    [entryPoints.http.redirect]
+      entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+<% if @traefik_whitelist %>
+    [entryPoints.https.whiteList]
+      sourceRange = ["<%= @traefik_whitelist_array.join('","') %>"]
+<% end %>
+
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+        certFile = "<%= @ssl_certfile %>"
+        keyFile = "<%= @ssl_certkey %>"
+<% end %>
+[retry]
+
+
+[api]
+  # Name of the related entry point
+  #
+  # Optional
+  # Default: "traefik"
+  #
+  entryPoint = "traefik"
+
+  # Enable Dashboard
+  #
+  # Optional
+  # Default: true
+  #
+  dashboard = true
+
+  # Enable debug mode.
+  # This will install HTTP handlers to expose Go expvars under /debug/vars and
+  # pprof profiling data under /debug/pprof/.
+  # Additionally, the log level will be set to DEBUG.
+  #
+  # Optional
+  # Default: false
+  #
+  debug = true
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "naturalis.nl"
+watch = true
+exposedbydefault = false
