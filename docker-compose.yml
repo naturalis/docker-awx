@@ -45,13 +45,11 @@ services:
       - rabbitmq
       - memcached
       - postgres
-    ports:
-      - "80:8052"
-#    labels:
-#      - "traefik.backend=naturalis-awx"
-#      - "traefik.enable=true"
-#      - "traefik.port=80"
-#      - "${SITE_URL:-traefik.frontend.rule=Host:awx.museum.naturalis.nl}"
+    labels:
+      - "traefik.backend=naturalis-awx"
+      - "traefik.enable=true"
+      - "traefik.port=8052"
+      - "${SITE_URL:-traefik.frontend.rule=Host:awx.museum.naturalis.nl}"
     hostname: awxweb
     user: root
     env_file:
