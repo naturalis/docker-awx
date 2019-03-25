@@ -10,6 +10,8 @@ services:
       options:
         max-size: '10m'
         max-file: '5'
+    volumes:
+      - /var/backup/pgsql:/var/backup/pgsql
     env_file:
       - .env
 
