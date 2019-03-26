@@ -1,21 +1,26 @@
 # docker_awx
 
-AWX setup based on docker-compose. Ready for deployment with Puppet.
+Docker compose configuration for [AWX](https://github.com/ansible/awx). Ready
+for deployment with
+[Puppet](https://github.com/naturalis/puppet-docker_compose).
 
-Docker-compose
---------------
-Docker-compose definition for deployment of naturalis AWX server. Which consists of:
-- postgres
-- rabbitmq
-- memcached
-- awx_web
-- awx_task
-- traefik
+## Docker-compose
 
-Result
-------
-Working AWX server available on https://awx.museum.naturalis.nl
+Docker-compose definition for deployment of Naturalis AWX server. Which consists
+of:
 
-Limitations
------------
-This has not been tested yet.
+* `postgres`
+* `rabbitmq`
+* `memcached`
+* `awx_web`
+* `awx_task`
+* `traefik`
+
+## Result
+
+Working AWX server available on
+[awx.museum.naturalis.nl](https://awx.museum.naturalis.nl).
+
+## Limitations
+
+Deployment has been tested on Ubuntu 18.04.
