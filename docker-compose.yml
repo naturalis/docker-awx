@@ -44,7 +44,7 @@ services:
       - "traefik.port=8052"
       - "${SITE_URL:-traefik.frontend.rule=Host:awx.museum.naturalis.nl}"
     volumes:
-      - "{BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
     hostname: awxweb
     user: root
     env_file:
@@ -60,7 +60,7 @@ services:
       - awx_web
       - postgres
     volumes:
-      - "{BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
     hostname: awx
     user: root
     env_file:
