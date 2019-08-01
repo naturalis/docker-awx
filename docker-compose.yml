@@ -13,6 +13,7 @@ services:
     restart: unless-stopped
     logging: *default-logging
     volumes:
+      - ${BASE_PATH:-/data}/pgdata:/var/lib/postgresql/data
       - /var/backup/pgsql:/var/backup/pgsql
     env_file:
       - .env
