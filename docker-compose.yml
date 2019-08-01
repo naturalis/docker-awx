@@ -1,15 +1,17 @@
-version: '3'
+version: '3.4'
+
+x-logging:
+  &default-logging
+  options:
+    max-size: '10m'
+    max-file: '5'
+  driver: json-file
 
 services:
-
   postgres:
     image: "postgres:9.6"
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+    logging: *default-logging
     volumes:
       - /var/backup/pgsql:/var/backup/pgsql
     env_file:
@@ -18,31 +20,19 @@ services:
   rabbitmq:
     image: "rabbitmq:3"
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+    logging: *default-logging
     env_file:
       - .env
 
   memcached:
     image: "memcached:alpine"
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+    logging: *default-logging
 
   awx_web:
     image: "ansible/awx_web:3.0.1"
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+    logging: *default-logging
     links:
       - rabbitmq
       - memcached
@@ -60,11 +50,7 @@ services:
   awx_task:
     image: "ansible/awx_task:3.0.1"
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+    logging: *default-logging
     links:
       - rabbitmq
       - memcached
@@ -76,26 +62,24 @@ services:
       - .env
 
   traefik:
-    image: traefik:1.7.4
-    container_name: traefik
+    image: traefik:1.7.12
     restart: unless-stopped
+    environment:
+      - TRANSIP_PRIVATE_KEY_PATH=/.transip.key
+      - TRANSIP_ACCOUNT_NAME=${TRANSIP_ACCOUNT_NAME:-naturalis}
     ports:
       - 80:80
       - 443:443
       - 8081:8080
     networks:
-      - default
       - web
-    logging:
-      driver: "json-file"
-      options:
-        max-size: '10m'
-        max-file: '5'
+      - default
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${BASE_PATH:-/data}/traefiklogs/traefik.log:/var/log/traefik.log
       - ${TRAEFIK_TOML_FILE:-./traefik.toml}:/traefik.toml
-      - ${CERTDIR:-/etc/letsencrypt}:/etc/letsencrypt
+      - ./.transip.key:/.transip.key
+      - ./acme.json:/acme.json
+    logging: *default-logging
 
 networks:
     default:

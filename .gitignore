@@ -1,1 +1,4 @@
 .env
+traefik.toml
+acme.json
+.transip.key
