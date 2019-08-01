@@ -31,7 +31,7 @@ services:
     logging: *default-logging
 
   awx_web:
-    image: "ansible/awx_web:3.0.1"
+    image: "ansible/awx_web:6.1.0"
     restart: unless-stopped
     logging: *default-logging
     links:
@@ -49,7 +49,7 @@ services:
       - .env
 
   awx_task:
-    image: "ansible/awx_task:3.0.1"
+    image: "ansible/awx_task:6.1.0"
     restart: unless-stopped
     logging: *default-logging
     links:
