@@ -34,7 +34,7 @@ services:
     image: "ansible/awx_web:6.1.0"
     restart: unless-stopped
     logging: *default-logging
-    links:
+    depends_on:
       - rabbitmq
       - memcached
       - postgres
@@ -43,6 +43,8 @@ services:
       - "traefik.enable=true"
       - "traefik.port=8052"
       - "${SITE_URL:-traefik.frontend.rule=Host:awx.museum.naturalis.nl}"
+    volumes:
+      - "{BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
     hostname: awxweb
     user: root
     env_file:
@@ -52,11 +54,13 @@ services:
     image: "ansible/awx_task:6.1.0"
     restart: unless-stopped
     logging: *default-logging
-    links:
+    depends_on:
       - rabbitmq
       - memcached
-      - awx_web:awxweb
+      - awx_web
       - postgres
+    volumes:
+      - "{BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
     hostname: awx
     user: root
     env_file:

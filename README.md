@@ -16,6 +16,8 @@ of:
 * `awx_task`
 * `traefik`
 
+Create file SECRET_KEY in BASE_PATH with unique key which is used for encrypting and decrypting database storage. 
+
 ## Result
 
 Working AWX server available on
