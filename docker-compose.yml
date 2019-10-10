@@ -61,6 +61,7 @@ services:
       - postgres
     volumes:
       - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "${BASE_PATH:-/data}/ansible:/data/ansible"
     hostname: awx
     user: root
     env_file:
