@@ -40,7 +40,7 @@ services:
       - postgres
     labels:
       - "traefik.backend=naturalis-awx"
-      - "traefik.enable=true"
+      - "traefik.enable=${TRAEFIK_ENABLE:-true}"
       - "traefik.port=8052"
       - "${SITE_URL:-traefik.frontend.rule=Host:awx.museum.naturalis.nl}"
     volumes:
