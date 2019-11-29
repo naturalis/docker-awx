@@ -19,7 +19,7 @@ services:
       - .env
 
   rabbitmq:
-    image: "ansible/awx_rabbitmq:3.7.21"
+    image: "rabbitmq:3"
     restart: unless-stopped
     logging: *default-logging
     env_file:
@@ -31,7 +31,7 @@ services:
     logging: *default-logging
 
   awx_web:
-    image: "ansible/awx_web:9.0.1"
+    image: "ansible/awx_web:6.1.0"
     restart: unless-stopped
     logging: *default-logging
     depends_on:
@@ -52,7 +52,7 @@ services:
       - .env
 
   awx_task:
-    image: "ansible/awx_task:9.0.1"
+    image: "ansible/awx_task:6.1.0"
     restart: unless-stopped
     logging: *default-logging
     depends_on:
