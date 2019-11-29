@@ -42,6 +42,7 @@ services:
       - traefik.enable=${TRAEFIK_ENABLE:-true}
       - traefik.http.routers.awx.entrypoints=https
       - traefik.http.routers.awx.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-route53}
+      - traefik.http.services.awx.loadbalancer.server.port=8052
       - traefik.http.routers.awx.tls=true
       - traefik.http.routers.awx.rule=${AWX_URL_CONFIG:-Host(`awx.infra.naturalis.nl`)}
     volumes:
