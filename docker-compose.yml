@@ -46,7 +46,7 @@ services:
       - traefik.http.routers.awx.rule=${AWX_URL_CONFIG:-Host(`awx.infra.naturalis.nl`)}
     volumes:
       - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
-    hostname: awx_web
+    hostname: awxweb
     user: root
     env_file:
       - .env
@@ -63,7 +63,7 @@ services:
     volumes:
       - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
       - "${BASE_PATH:-/data}/ansible:/data/ansible"
-    hostname: awx_task
+    hostname: awxtask
     user: root
     env_file:
       - .env
