@@ -8,65 +8,93 @@ x-logging:
   driver: json-file
 
 services:
-  postgres:
-    image: "postgres:9.6"
-    restart: unless-stopped
-    logging: *default-logging
-    volumes:
-      - ${BASE_PATH:-/data}/pgdata:/var/lib/postgresql/data
-      - /var/backup/pgsql:/var/backup/pgsql
-    env_file:
-      - .env
-
-  rabbitmq:
-    image: "rabbitmq:3"
-    restart: unless-stopped
-    logging: *default-logging
-    env_file:
-      - .env
-
-  memcached:
-    image: "memcached:alpine"
-    restart: unless-stopped
-    logging: *default-logging
-
-  awx_web:
-    image: "ansible/awx_web:6.1.0"
-    restart: unless-stopped
-    logging: *default-logging
+  web:
+    image: ansible/awx_web:9.0.1
+    container_name: awx_web
     depends_on:
       - rabbitmq
       - memcached
       - postgres
+    hostname: awxweb
+    user: root
+    restart: unless-stopped
+    volumes:
+      - "/opt/composeproject/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "/opt/composeproject/environment.sh:/etc/tower/conf.d/environment.sh"
+      - "/opt/composeproject/credentials.py:/etc/tower/conf.d/credentials.py"
+      - "/opt/composeproject/nginx.conf:/etc/nginx/nginx.conf:ro"
+    environment:
+      http_proxy:
+      https_proxy:
+      no_proxy:
     labels:
       - traefik.enable=${TRAEFIK_ENABLE:-true}
       - traefik.http.routers.awx.entrypoints=https
       - traefik.http.routers.awx.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-route53}
       - traefik.http.routers.awx.tls=true
       - traefik.http.routers.awx.rule=${AWX_URL_CONFIG:-Host(`awx.infra.naturalis.nl`)}
-    volumes:
-      - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
-    hostname: awx_web
-    user: root
-    env_file:
-      - .env
-
-  awx_task:
-    image: "ansible/awx_task:6.1.0"
-    restart: unless-stopped
     logging: *default-logging
+
+  task:
+    image: ansible/awx_task:9.0.1
+    container_name: awx_task
     depends_on:
       - rabbitmq
       - memcached
-      - awx_web
+      - web
       - postgres
-    volumes:
-      - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
-      - "${BASE_PATH:-/data}/ansible:/data/ansible"
-    hostname: awx_task
+    hostname: awx
     user: root
-    env_file:
-      - .env
+    restart: unless-stopped
+    volumes:
+      - "/opt/composeproject/SECRET_KEY:/etc/tower/SECRET_KEY"
+      - "/opt/composeproject/environment.sh:/etc/tower/conf.d/environment.sh"
+      - "/opt/composeproject/credentials.py:/etc/tower/conf.d/credentials.py"
+    environment:
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    logging: *default-logging
+
+  rabbitmq:
+    image: ansible/awx_rabbitmq:3.7.4
+    container_name: awx_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_ERLANG_COOKIE: cookiemonster
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    logging: *default-logging
+
+  memcached:
+    image: "memcached:alpine"
+    container_name: awx_memcached
+    restart: unless-stopped
+    environment:
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    logging: *default-logging
+
+  postgres:
+    image: postgres:10
+    container_name: awx_postgres
+    restart: unless-stopped
+    volumes:
+      - /data/pgdata/10/data/:/var/lib/postgresql/data/pgdata:Z
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      http_proxy:
+      https_proxy:
+      no_proxy:
+    logging: *default-logging
 
   traefik:
     image: traefik:2.0.5
@@ -79,15 +107,9 @@ services:
       - 80:80
       - 443:443
       - 8081:8080
-    networks:
-      - web
-      - default
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik:/etc/traefik
     logging: *default-logging
 
-networks:
-    default:
-    web:
-        external: true
+
