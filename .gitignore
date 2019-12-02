@@ -1,3 +1,6 @@
 .env
 traefik/traefik.toml
 traefik/acme.json
+SECRET_KEY
+credentials.py
+environment.sh

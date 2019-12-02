@@ -18,6 +18,11 @@ of:
 
 Create file SECRET_KEY in BASE_PATH with unique key which is used for encrypting and decrypting database storage. 
 
+Copy .env.template to .env and adjust secrets
+Copy credentials.py.template to credentials.py and adjust secrets
+Copy environment.sh.template to environment.sh and adjust secrets
+
+
 ## Result
 
 Working AWX server available on
