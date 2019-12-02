@@ -85,7 +85,7 @@ services:
     container_name: awx_postgres
     restart: unless-stopped
     volumes:
-      - /data/pgdata/10/data/:/var/lib/postgresql/data/pgdata:Z
+      - ${BASE_PATH:-/data}/pgdata:/var/lib/postgresql/data/pgdata:Z
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
