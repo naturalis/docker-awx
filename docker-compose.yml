@@ -86,10 +86,10 @@ services:
       - "--certificatesresolvers.route53.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.route53.acme.storage=/letsencrypt/route53.json"
       - "--certificatesresolvers.default.acme.httpChallenge=true"
-      - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web
+      - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.default.acme.storage=/etc/traefik/acme.json"
-      - "--global.sendAnonymousUsage=false
+      - "--global.sendAnonymousUsage=false"
     ports:
       - 80:80
       - 443:443
