@@ -84,7 +84,7 @@ services:
       - "--certificatesresolvers.route53.acme.dnschallenge=true"
       - "--certificatesresolvers.route53.acme.dnschallenge.provider=route53"
       - "--certificatesresolvers.route53.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.route53.acme.storage=/letsencrypt/route53.json"
+      - "--certificatesresolvers.route53.acme.storage=/etc/traefik/route53.json"
       - "--certificatesresolvers.default.acme.httpChallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${ACME_EMAIL}"
