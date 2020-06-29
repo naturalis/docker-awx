@@ -40,10 +40,10 @@ services:
       - postgres
     labels:
       - traefik.enable=${TRAEFIK_ENABLE:-true}
-      - traefik.http.routers.awx.entrypoints=https
-      - traefik.http.routers.awx.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-route53}
+      - traefik.http.routers.awx.entrypoints=websecure
+      - traefik.http.routers.awx.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-default}
       - traefik.http.routers.awx.tls=true
-      - traefik.http.routers.awx.rule=${AWX_URL_CONFIG:-Host(`awx.infra.naturalis.nl`)}
+      - traefik.http.routers.awx.rule=${AWX_URL_CONFIG:-Host(`awx.museum.naturalis.nl`)}
     volumes:
       - "${BASE_PATH:-/data}/SECRET_KEY:/etc/tower/SECRET_KEY"
     hostname: awxweb
@@ -69,12 +69,27 @@ services:
       - .env
 
   traefik:
-    image: traefik:2.0.5
+    image: traefik:2.2.1
     restart: unless-stopped
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_HOSTED_ZONE_ID=${AWS_HOSTED_ZONE_ID}
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.route53.acme.dnschallenge=true"
+      - "--certificatesresolvers.route53.acme.dnschallenge.provider=route53"
+      - "--certificatesresolvers.route53.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.route53.acme.storage=/letsencrypt/route53.json"
+      - "--certificatesresolvers.default.acme.httpChallenge=true"
+      - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web
+      - "--certificatesresolvers.default.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.default.acme.storage=/etc/traefik/acme.json"
+      - "--global.sendAnonymousUsage=false
     ports:
       - 80:80
       - 443:443
@@ -82,6 +97,11 @@ services:
     networks:
       - web
       - default
+    labels:
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik:/etc/traefik
